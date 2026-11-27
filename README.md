@@ -8,6 +8,7 @@ Google’s #BuildHybridAI 2026 entry uses **Android and desktop Chrome**. Fireba
 
 ## Project documents
 
+- [Grand Prize strategy](RESEARCH.md#grand-prize-strategy) explains what makes this entry competitive, what evidence judges should see, and which results would weaken the case.
 - [RESEARCH.md](RESEARCH.md) covers the official rubric, competing products, Firebase capabilities, and the assumptions we need to test.
 - [BUILD_PLAN.md](BUILD_PLAN.md) covers the demo, data flow, team ownership, verification, and submission package.
 
