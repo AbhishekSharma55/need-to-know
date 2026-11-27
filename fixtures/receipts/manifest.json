@@ -1,0 +1,147 @@
+[
+  {
+    "id": "fieldwork",
+    "image": "fieldwork.png",
+    "layout": "Wide, high-contrast retail receipt",
+    "fields": {
+      "merchant": "Fieldwork Supply",
+      "purchaseDate": "Nov 22, 2026",
+      "product": "Studio Wireless Headphones",
+      "subtotal": "$80.00",
+      "total": "$86.40",
+      "orderNumber": "FW-82419",
+      "name": "Jamie Morgan",
+      "address": "462 Example Avenue",
+      "paymentDigits": "4826",
+      "paymentReference": "AUTH-717930"
+    },
+    "requests": [
+      {
+        "preset": "reimbursement",
+        "text": "Include the retailer, transaction date, and amount you paid. If the receipt lists both a subtotal and a final amount, use the final amount.",
+        "fields": [
+          "merchant",
+          "purchaseDate",
+          "total"
+        ]
+      },
+      {
+        "preset": "warranty",
+        "text": "Provide what you bought, the purchase date, and the original order reference. A payment authorization code is a different reference.",
+        "fields": [
+          "product",
+          "purchaseDate",
+          "orderNumber"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "northline",
+    "image": "northline.png",
+    "layout": "Rotated thermal-style receipt with a gray background",
+    "fields": {
+      "merchant": "Northline Audio",
+      "purchaseDate": "2026-11-18",
+      "product": "Compact Speaker",
+      "subtotal": "$50.00",
+      "total": "$54.20",
+      "orderNumber": "NL-11348",
+      "name": "Alex Sample",
+      "address": "151 Fictional Lane",
+      "paymentDigits": "2086",
+      "paymentReference": "AUTH-09382"
+    },
+    "requests": [
+      {
+        "preset": "reimbursement",
+        "text": "Attach the store and the final amount only. The account already shows the transaction date.",
+        "fields": [
+          "merchant",
+          "total"
+        ]
+      },
+      {
+        "preset": "warranty",
+        "text": "Include the purchased item, date, and purchase reference. The reference must identify the order.",
+        "fields": [
+          "product",
+          "purchaseDate",
+          "orderNumber"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pine",
+    "image": "pine.png",
+    "layout": "Dense e-receipt with short labels and nearby payment identifiers",
+    "fields": {
+      "merchant": "Pine and Co",
+      "purchaseDate": "18 Nov 2026",
+      "product": "Travel Adapter",
+      "subtotal": "$38.00",
+      "total": "$41.72",
+      "orderNumber": "PC-90215",
+      "name": "Morgan Example",
+      "address": "38 Demo Street",
+      "paymentDigits": "6813",
+      "paymentReference": "PAY-00634"
+    },
+    "requests": [
+      {
+        "preset": "reimbursement",
+        "text": "Use the transaction date, amount paid, and order reference to match the card entry. We already know the retailer.",
+        "fields": [
+          "purchaseDate",
+          "total",
+          "orderNumber"
+        ]
+      },
+      {
+        "preset": "warranty",
+        "text": "Send the product and date of purchase only. We already have the order reference.",
+        "fields": [
+          "product",
+          "purchaseDate"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "copper",
+    "image": "copper.png",
+    "layout": "Faded, slightly rotated paper receipt with a payment reference and no order number",
+    "fields": {
+      "merchant": "Copper Paper",
+      "purchaseDate": "11/16/2026",
+      "product": "Desk Lamp",
+      "subtotal": "$36.00",
+      "total": "$38.88",
+      "name": "Casey Example",
+      "address": "95 Sample Way",
+      "paymentDigits": "1042",
+      "paymentReference": "AUTH-36980"
+    },
+    "requests": [
+      {
+        "preset": "reimbursement",
+        "text": "List the seller, receipt date, and total paid.",
+        "fields": [
+          "merchant",
+          "purchaseDate",
+          "total"
+        ]
+      },
+      {
+        "preset": "warranty",
+        "text": "Show the item and purchase date. Include the order number if it appears on the receipt. If the receipt has no order number, give the store name instead.",
+        "fields": [
+          "product",
+          "purchaseDate",
+          "merchant"
+        ]
+      }
+    ]
+  }
+]

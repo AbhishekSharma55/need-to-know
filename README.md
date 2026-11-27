@@ -49,4 +49,12 @@ npm --prefix web test
 npm --prefix web run benchmark
 ```
 
-The benchmark compares a fixed template with the checked-in sample checklists using pre-transcribed synthetic values. It measures field selection. Model accuracy and recipient acceptance require separate trials.
+The benchmark uses local Tesseract.js OCR on four [synthetic receipt images](fixtures/receipts/) and evaluates eight requests. It compares a generic template, a separate preset for each purpose, and the hand-labeled fields from each request. Each case counts extra fields, omissions, and incorrect values. The hand-labeled result shows what the same OCR output can produce with the correct checklist supplied. Use `npm --prefix web run --silent benchmark -- --json` for the per-field results. Firebase model accuracy and recipient acceptance require separate trials.
+
+| Synthetic benchmark method | Exact outputs | Extra fields | Missing fields | Incorrect values |
+| --- | ---: | ---: | ---: | ---: |
+| OCR + generic template | 2 / 8 | 9 | 7 | 0 |
+| OCR + purpose preset | 4 / 8 | 3 | 2 | 0 |
+| OCR + hand-labeled request fields | 8 / 8 | 0 | 0 | 0 |
+
+Person A can use the [shared receipt manifest](fixtures/receipts/manifest.json) and PNGs for Android evaluation. `fieldwork.png` contains the same sample values as the Chrome workspace. Its two requests provide the expected reimbursement and warranty exports. The other receipts include different layouts, similar identifiers, and requests that depart from a standard template.
