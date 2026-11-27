@@ -4,11 +4,13 @@ import {
   GoogleAIBackend,
   InferenceMode,
   InferenceSource,
+  Schema,
 } from 'firebase/ai';
 import { getApps, initializeApp } from 'firebase/app';
-import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
+import { CustomProvider, initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
 import {
   cloudPrompt,
+  fieldLabels,
   parseChecklist,
   parseSuggestions,
   receiptPrompt,
@@ -21,9 +23,40 @@ const config = {
   projectId: env.VITE_FIREBASE_PROJECT_ID,
   appId: env.VITE_FIREBASE_APP_ID,
 };
+const enterpriseSiteKey = env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY;
+const localAppCheckDebug = env.DEV && env.VITE_APPCHECK_LOCAL_DEBUG === 'true';
+const checklistSchema = Schema.object({
+  properties: {
+    title: Schema.string(),
+    items: Schema.array({ items: Schema.object({
+      properties: {
+        field: Schema.enumString({ enum: Object.keys(fieldLabels) }),
+        evidence: Schema.string({ description: 'An exact excerpt of the recipient’s request' }),
+        note: Schema.string(),
+      },
+    }) }),
+    questions: Schema.array({ items: Schema.string() }),
+  },
+});
 
 export const localConfigured = Boolean(config.apiKey && config.projectId && config.appId);
-export const cloudConfigured = localConfigured && Boolean(env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY);
+export const cloudConfigured = localConfigured && Boolean(enterpriseSiteKey || localAppCheckDebug);
+
+function cloudAppCheckProvider() {
+  if (enterpriseSiteKey) return new ReCaptchaEnterpriseProvider(enterpriseSiteKey);
+
+  const debugToken = (globalThis as typeof globalThis & {
+    FIREBASE_APPCHECK_DEBUG_TOKEN?: string | boolean;
+  }).FIREBASE_APPCHECK_DEBUG_TOKEN;
+  if (!localAppCheckDebug || !debugToken) {
+    throw new Error('Set up the local App Check debug token before calling Gemini.');
+  }
+
+  // The Firebase SDK handles the actual debug token exchange before calling this provider.
+  return new CustomProvider({
+    async getToken() { throw new Error('Firebase App Check debug mode is inactive.'); },
+  });
+}
 
 function getService(kind: 'receipt' | 'checklist') {
   if (!localConfigured) throw new Error('The Firebase web app configuration is missing.');
@@ -31,10 +64,11 @@ function getService(kind: 'receipt' | 'checklist') {
 
   const name = `need-to-know-${kind}`;
   const existing = getApps().find(app => app.name === name);
+  const provider = kind === 'checklist' && !existing ? cloudAppCheckProvider() : undefined;
   const app = existing ?? initializeApp(config, name);
-  if (kind === 'checklist' && !existing) {
+  if (provider) {
     initializeAppCheck(app, {
-      provider: new ReCaptchaEnterpriseProvider(env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY),
+      provider,
       isTokenAutoRefreshEnabled: true,
     });
   }
@@ -85,7 +119,7 @@ export async function analyzeChecklist(context: ChecklistContext) {
       model: env.VITE_CLOUD_MODEL || 'gemini-3.5-flash-lite',
       generationConfig: {
         maxOutputTokens: 1600,
-        ...(!grounded && { responseMimeType: 'application/json' }),
+        ...(!grounded && { responseMimeType: 'application/json', responseSchema: checklistSchema }),
       },
       ...(grounded && { tools: [{ googleSearch: {} }] }),
     },

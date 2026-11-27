@@ -29,7 +29,7 @@ Open the local URL shown by Vite. Switch between **Work reimbursement** and **Wa
 
 ### Enable live Firebase AI Logic
 
-Register the web app in the team’s Firebase project, enable Firebase AI Logic with the Gemini Developer API, and register App Check using reCAPTCHA Enterprise. Put the web configuration and reCAPTCHA site key in an ignored `web/.env.local` file and restart Vite. [Firebase AI Logic setup](https://firebase.google.com/docs/ai-logic/hybrid/web/get-started) · [Firebase AI Logic App Check](https://firebase.google.com/docs/ai-logic/app-check)
+Register the web app in the team’s Firebase project, then enable Firebase AI Logic with the Gemini Developer API. Put the web configuration in an ignored `web/.env.local` file and restart Vite. A hosted build uses a registered reCAPTCHA Enterprise App Check site key. [Firebase AI Logic setup](https://firebase.google.com/docs/ai-logic/hybrid/web/get-started) · [Firebase AI Logic App Check](https://firebase.google.com/docs/ai-logic/app-check)
 
 ```dotenv
 VITE_FIREBASE_API_KEY=your_firebase_web_api_key
@@ -39,7 +39,9 @@ VITE_RECAPTCHA_ENTERPRISE_SITE_KEY=your_recaptcha_enterprise_site_key
 VITE_CLOUD_MODEL=gemini-3.5-flash-lite
 ```
 
-For local cloud testing, set `self.FIREBASE_APPCHECK_DEBUG_TOKEN = true` in Chrome DevTools before the first cloud call. Register the generated token in the Firebase console and keep it private. For on-device inference, choose **Prepare local model** in supported desktop Chrome, wait for it to be ready, and choose **Read with Gemini Nano**. For cloud inference, open the checklist controls, choose **Review cloud request**, check the prompt, and choose **Send to Gemini**. [App Check localhost setup](https://firebase.google.com/docs/app-check/web/debug-provider) · [Chrome on-device requirements](https://developer.chrome.com/docs/ai/prompt-api)
+For local cloud testing without a site key, omit `VITE_RECAPTCHA_ENTERPRISE_SITE_KEY` and set `VITE_APPCHECK_LOCAL_DEBUG=true`. Set `self.FIREBASE_APPCHECK_DEBUG_TOKEN = true` in Chrome DevTools before the first cloud call, then register the generated token in the Firebase console. The debug option runs only in Vite development mode. Store tokens in the browser or the local Firebase CLI credential store. [App Check localhost setup](https://firebase.google.com/docs/app-check/web/debug-provider)
+
+For on-device inference, choose **Prepare local model** in supported desktop Chrome, wait for it to be ready, and choose **Read with Gemini Nano**. For cloud inference, open the checklist controls, choose **Review cloud request**, check the prompt, and choose **Send to Gemini**. [Chrome on-device requirements](https://developer.chrome.com/docs/ai/prompt-api)
 
 ### Run checks
 
@@ -49,12 +51,15 @@ npm --prefix web test
 npm --prefix web run benchmark
 ```
 
-The benchmark uses local Tesseract.js OCR on four [synthetic receipt images](fixtures/receipts/) and evaluates eight requests. It compares a generic template, a separate preset for each purpose, and the hand-labeled fields from each request. Each case counts extra fields, omissions, and incorrect values. The hand-labeled result shows what the same OCR output can produce with the correct checklist supplied. Use `npm --prefix web run --silent benchmark -- --json` for the per-field results. Firebase model accuracy and recipient acceptance require separate trials.
+The benchmark uses local Tesseract.js OCR on four [synthetic receipt images](fixtures/receipts/) and evaluates eight requests. It applies a generic template, separate presets for each purpose, hand-labeled request fields, and [checklists from eight live Firebase AI Logic calls](fixtures/receipts/cloud-checklists.json) to the same OCR output. Each case counts extra fields, omissions, and incorrect values. Use `npm --prefix web run --silent benchmark -- --json` for the per-field results.
 
 | Synthetic benchmark method | Exact outputs | Extra fields | Missing fields | Incorrect values |
 | --- | ---: | ---: | ---: | ---: |
 | OCR + generic template | 2 / 8 | 9 | 7 | 0 |
 | OCR + purpose preset | 4 / 8 | 3 | 2 | 0 |
 | OCR + hand-labeled request fields | 8 / 8 | 0 | 0 | 0 |
+| OCR + recorded Gemini cloud checklist | 8 / 8 | 0 | 0 | 0 |
+
+These are synthetic development cases used to refine cloud checklist handling. They measure field selection with OCR held constant. Live Chrome Gemini Nano extraction and recipient acceptance require separate verification.
 
 Person A can use the [shared receipt manifest](fixtures/receipts/manifest.json) and PNGs for Android evaluation. `fieldwork.png` contains the same sample values as the Chrome workspace. Its two requests provide the expected reimbursement and warranty exports. The other receipts include different layouts, similar identifiers, and requests that depart from a standard template.

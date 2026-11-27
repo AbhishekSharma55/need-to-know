@@ -72,6 +72,25 @@ test('receipt inference cannot return an unrequested field or a value unsupporte
   assert.deepEqual(Object.keys(result), ['orderNumber']);
 });
 
+test('an order reference does not authorize exporting a payment reference', () => {
+  const context = createContext('request', 'Use the order reference to match the card entry.');
+  const result = parseChecklist(JSON.stringify({
+    items: [{ field: 'paymentReference', evidence: 'order reference to match the card entry', note: 'Match the card entry.' }],
+    questions: [],
+  }), context);
+  assert.deepEqual(result.items, []);
+  assert.match(result.questions[0], /explicitly identify a payment reference/);
+});
+
+test('accepts an explicit payment authorization reference', () => {
+  const context = createContext('request', 'Include the payment authorization code.');
+  const result = parseChecklist(JSON.stringify({
+    items: [{ field: 'paymentReference', evidence: 'payment authorization code', note: 'Include the authorization.' }],
+    questions: [],
+  }), context);
+  assert.deepEqual(result.items.map(item => item.field), ['paymentReference']);
+});
+
 test('the comparator counts excess and missing fields separately', () => {
   assert.deepEqual(compareFields(['merchant', 'purchaseDate', 'total'], ['product', 'purchaseDate', 'orderNumber']), {
     extra: ['merchant', 'total'],
