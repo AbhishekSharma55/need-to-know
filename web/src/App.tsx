@@ -231,7 +231,7 @@ export function App() {
           : 'No clear matches were found. Enter the requested values manually.',
       );
     } catch {
-      setReceiptMessage('On-device reading failed. Prepare Gemini Nano in supported desktop Chrome, or enter the values manually.');
+      setReceiptMessage('On-device reading didn’t complete. Try again or enter the values manually.');
     } finally {
       setBusy(undefined);
     }

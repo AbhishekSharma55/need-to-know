@@ -60,6 +60,6 @@ The benchmark uses local Tesseract.js OCR on four [synthetic receipt images](fix
 | OCR + hand-labeled request fields | 8 / 8 | 0 | 0 | 0 |
 | OCR + recorded Gemini cloud checklist | 8 / 8 | 0 | 0 | 0 |
 
-These are synthetic development cases used to refine cloud checklist handling. They measure field selection with OCR held constant. Live Chrome Gemini Nano extraction and recipient acceptance require separate verification.
+These are synthetic development cases used to refine cloud checklist handling. They measure field selection with OCR held constant. Separately, a live desktop Chrome smoke test read the synthetic warranty receipt using Gemini Nano. The workspace reported on-device Firebase AI Logic inference and showed source evidence for the product, purchase date, and order number `FW-82419`. The preview contained those three fields. Recipient acceptance still requires a separate trial.
 
 Person A can use the [shared receipt manifest](fixtures/receipts/manifest.json) and PNGs for Android evaluation. `fieldwork.png` contains the same sample values as the Chrome workspace. Its two requests provide the expected reimbursement and warranty exports. The other receipts include different layouts, similar identifiers, and requests that depart from a standard template.
